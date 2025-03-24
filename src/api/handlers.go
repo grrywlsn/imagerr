@@ -1,12 +1,14 @@
 package api
 
 import (
+    "log"
     "net/http"
     "strings"
     "path/filepath"
     "github.com/gin-gonic/gin"
-    "imagerr/src/db"
-    "imagerr/src/storage"
+    "github.com/grrywlsn/imagerr/src/db"
+    "github.com/grrywlsn/imagerr/src/storage"
+    "github.com/grrywlsn/imagerr/src/search"
 )
 
 func UploadImage(c *gin.Context) {

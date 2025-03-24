@@ -4,10 +4,10 @@ import (
     "log"
     "github.com/gin-gonic/gin"
     "github.com/joho/godotenv"
-    "imagerr/src/api"
-    "imagerr/src/db"
-    "imagerr/src/storage"
-    "imagerr/src/search"
+    "github.com/grrywlsn/imagerr/src/api"
+    "github.com/grrywlsn/imagerr/src/db"
+    "github.com/grrywlsn/imagerr/src/storage"
+    "github.com/grrywlsn/imagerr/src/search"
 )
 
 func main() {
