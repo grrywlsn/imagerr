@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Imagerr - Image Search</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Imagerr</h1>
+        <div class="search-container">
+            <input type="text" id="search" placeholder="Search images...">
+            <div id="autocomplete-results"></div>
+        </div>
+        
+        <div class="upload-container">
+            <h2>Upload Image</h2>
+            <form id="upload-form">
+                <input type="file" accept="image/*" required>
+                <textarea placeholder="Description" required></textarea>
+                <input type="text" placeholder="Tags (comma separated)" required>
+                <button type="submit">Upload</button>
+            </form>
+        </div>
+
+        <div id="results"></div>
+    </div>
+    <script src="/static/app.js"></script>
+</body>
+</html>
