@@ -9,6 +9,7 @@ import (
     "github.com/grrywlsn/imagerr/src/db"
     "github.com/grrywlsn/imagerr/src/storage"
     "github.com/grrywlsn/imagerr/src/search"
+    "strconv"
 )
 
 func UploadImage(c *gin.Context) {
@@ -84,5 +85,23 @@ func SearchImages(c *gin.Context) {
 
 func GetImage(c *gin.Context) {
     id := c.Param("id")
-    // Implementation for getting a single image
+    imageID, err := strconv.ParseInt(id, 10, 64)
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid image ID"})
+        return
+    }
+
+    image, err := db.GetImageByID(imageID)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get image"})
+        return
+    }
+
+    if image == nil {
+        c.JSON(http.StatusNotFound, gin.H{"error": "Image not found"})
+        return
+    }
+
+    image.URL = storage.GetFileURL(image.StoragePath)
+    c.JSON(http.StatusOK, image)
 }

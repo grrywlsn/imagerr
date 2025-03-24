@@ -7,4 +7,5 @@ type Image struct {
     Tags        []string `json:"tags"`
     StoragePath string   `json:"storage_path"`
     CreatedAt   string   `json:"created_at"`
+    URL         string   `json:"url,omitempty"` // Added URL field
 }

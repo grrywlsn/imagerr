@@ -6,35 +6,34 @@ import (
     "io"
     "log"
     "os"
-    "path/filepath"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
     "github.com/aws/aws-sdk-go-v2/config"
     "github.com/aws/aws-sdk-go-v2/credentials"
     "github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
 var (
-    s3Client *s3.Client
+    s3Client   *s3.Client
     bucketName string
 )
 
 func InitS3() {
-    // Scaleway S3 endpoint
     endpoint := os.Getenv("S3_ENDPOINT")
     bucketName = os.Getenv("S3_BUCKET")
     region := os.Getenv("S3_REGION")
 
-    // Create custom resolver for Scaleway
-    customResolver := aws.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (aws.Endpoint, error) {
-        return aws.Endpoint{
-            URL: endpoint,
-        }, nil
-    })
-
     cfg, err := config.LoadDefaultConfig(context.TODO(),
         config.WithRegion(region),
-        config.WithEndpointResolverWithOptions(customResolver),
-        config.WithCredentials(credentials.NewStaticCredentialsProvider(
+        config.WithEndpointResolverWithOptions(aws.EndpointResolverWithOptionsFunc(
+            func(service, region string, options ...interface{}) (aws.Endpoint, error) {
+                return aws.Endpoint{
+                    URL:               endpoint,
+                    SigningRegion:    region,
+                    HostnameImmutable: true,
+                }, nil
+            })),
+        config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(
             os.Getenv("S3_ACCESS_KEY"),
             os.Getenv("S3_SECRET_KEY"),
             "",

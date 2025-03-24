@@ -2,7 +2,6 @@ package db
 
 import (
     "database/sql"
-    "encoding/json"
 )
 
 func CreateImage(filename, description, storagePath string, tags []string) (*Image, error) {
