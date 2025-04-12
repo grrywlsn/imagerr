@@ -19,6 +19,7 @@ func SetupRoutes(r *gin.Engine) {
         // Image routes
         api.POST("/upload", UploadImage)
         api.GET("/search", SearchImages)
+        api.GET("/image/:id", GetImage)
         api.GET("/images/recent", GetRecentUploads)
     }
 }

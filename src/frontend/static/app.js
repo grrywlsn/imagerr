@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             recentUploadsBody.innerHTML = images.map(image => `
                 <tr>
-                    <td><img src="${image.URL}" alt="${image.description}"></td>
+                    <td><img src="${image.URL || '#'}" alt="${image.description}" onerror="this.src='/static/placeholder.svg'"></td>
                     <td>${image.description}</td>
                     <td>${image.tags.join(', ')}</td>
                     <td>${new Date(image.created_at).toLocaleDateString()}</td>
@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 resultsDiv.innerHTML = images.map(image => `
                     <div class="image-card">
-                        <img src="${image.URL}" alt="${image.description}">
+                        <img src="${image.URL || '#'}" alt="${image.description}" onerror="this.src='/static/placeholder.svg'">
                         <p>${image.description}</p>
                         <p class="tags">${image.tags.join(', ')}</p>
                     </div>

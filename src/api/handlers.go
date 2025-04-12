@@ -75,6 +75,24 @@ func GetRecentUploads(c *gin.Context) {
     c.JSON(http.StatusOK, images)
 }
 
+func GetImage(c *gin.Context) {
+    idStr := c.Param("id")
+    id, err := strconv.ParseInt(idStr, 10, 64)
+    if err != nil {
+        c.HTML(http.StatusBadRequest, "error.html", gin.H{"error": "Invalid image ID"})
+        return
+    }
+
+    image, err := db.GetImageByID(id)
+    if err != nil || image == nil {
+        c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "Image not found"})
+        return
+    }
+
+    image.URL = storage.GetFileURL(image.StoragePath)
+    c.HTML(http.StatusOK, "image.html", gin.H{"Image": image})
+}
+
 func SearchImages(c *gin.Context) {
     query := c.Query("q")
     if query == "" {
@@ -103,27 +121,4 @@ func SearchImages(c *gin.Context) {
     }
 
     c.JSON(http.StatusOK, images)
-}
-
-func GetImage(c *gin.Context) {
-    id := c.Param("id")
-    imageID, err := strconv.ParseInt(id, 10, 64)
-    if err != nil {
-        c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid image ID"})
-        return
-    }
-
-    image, err := db.GetImageByID(imageID)
-    if err != nil {
-        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get image"})
-        return
-    }
-
-    if image == nil {
-        c.JSON(http.StatusNotFound, gin.H{"error": "Image not found"})
-        return
-    }
-
-    image.URL = storage.GetFileURL(image.StoragePath)
-    c.JSON(http.StatusOK, image)
 }

@@ -6,6 +6,7 @@ import (
     "io"
     "log"
     "os"
+    "strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
     "github.com/aws/aws-sdk-go-v2/config"
@@ -65,10 +66,11 @@ func UploadFile(file io.Reader, filename string) (string, error) {
 
 func GetFileURL(storagePath string) string {
     cdnDomain := os.Getenv("CDN_DOMAIN")
-    if cdnDomain != "" {
-        return fmt.Sprintf("%s/%s", cdnDomain, storagePath)
+    if cdnDomain == "" {
+        log.Fatal("CDN_DOMAIN environment variable is required")
     }
-    return fmt.Sprintf("%s/%s/%s", os.Getenv("S3_ENDPOINT"), bucketName, storagePath)
+    cdnDomain = strings.TrimRight(cdnDomain, "/")
+    return fmt.Sprintf("%s/%s", cdnDomain, storagePath)
 }
 
 func DeleteFile(storagePath string) error {

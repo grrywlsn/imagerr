@@ -40,11 +40,31 @@
                 <thead>
                     <tr>
                         <th>Thumbnail</th>
+                        <th>Filename</th>
                         <th>Description</th>
                         <th>Tags</th>
                         <th>Upload Date</th>
                     </tr>
                 </thead>
+                <tbody>
+                    {{range .Images}}
+                    <tr>
+                        <td>
+                            <a href="/image/{{.ID}}">
+                                <img src="{{.URL}}" alt="{{.Description}}" class="thumbnail">
+                            </a>
+                        </td>
+                        <td><a href="/image/{{.ID}}">{{.OriginalFilename}}</a></td>
+                        <td>{{.Description}}</td>
+                        <td>
+                            {{range .Tags}}
+                            <a href="/search?q={{.}}" class="tag-link">{{.}}</a>
+                            {{end}}
+                        </td>
+                        <td>{{.CreatedAt.Format "2006-01-02 15:04:05"}}</td>
+                    </tr>
+                    {{end}}
+                </tbody>
                 <tbody id="recent-uploads-body"></tbody>
             </table>
         </div>
