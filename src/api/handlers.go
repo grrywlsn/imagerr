@@ -60,21 +60,6 @@ func UploadImage(c *gin.Context) {
     c.JSON(http.StatusOK, image)
 }
 
-func GetRecentUploads(c *gin.Context) {
-    images, err := db.GetRecentImages(10)
-    if err != nil {
-        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch recent uploads"})
-        return
-    }
-
-    // Add CDN URLs to images
-    for i := range images {
-        images[i].URL = storage.GetFileURL(images[i].StoragePath)
-    }
-
-    c.JSON(http.StatusOK, images)
-}
-
 func GetImage(c *gin.Context) {
     idStr := c.Param("id")
     id, err := strconv.ParseInt(idStr, 10, 64)
@@ -95,28 +80,33 @@ func GetImage(c *gin.Context) {
 
 func SearchImages(c *gin.Context) {
     query := c.Query("q")
-    if query == "" {
-        c.JSON(http.StatusBadRequest, gin.H{"error": "Query parameter is required"})
-        return
-    }
-
-    // Search in Elasticsearch
-    searchResults, err := search.SearchImages(query)
-    if err != nil {
-        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to search images"})
-        return
-    }
-
-    // Get full image details from database
     var images []db.Image
-    for _, result := range searchResults {
-        image, err := db.GetImageByID(result.ID)
+    if query == "" {
+        // Fetch the 9 most recent images from the database
+        var err error
+        images, err = db.GetRecentImages(9)
         if err != nil {
-            continue
+            c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch recent images"})
+            return
         }
-        if image != nil {
-            image.URL = storage.GetFileURL(image.StoragePath)
-            images = append(images, *image)
+    } else {
+        // Search in Elasticsearch
+        searchResults, err := search.SearchImages(query)
+        if err != nil {
+            c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to search images"})
+            return
+        }
+
+        // Get full image details from database
+        for _, result := range searchResults {
+            image, err := db.GetImageByID(result.ID)
+            if err != nil {
+                continue
+            }
+            if image != nil {
+                image.URL = storage.GetFileURL(image.StoragePath)
+                images = append(images, *image)
+            }
         }
     }
 

@@ -39,16 +39,19 @@ func GetImageByID(id int64) (*Image, error) {
         &img.OriginalFilename,
         &img.UUIDFilename,
         &img.Description,
-        &img.Tags,
+        pq.Array(&img.Tags),
         &img.StoragePath,
         &img.CreatedAt,
     )
     if err == sql.ErrNoRows {
+        log.Printf("No image found with ID: %d", id)
         return nil, nil
     }
     if err != nil {
+        log.Printf("Error retrieving image with ID %d: %v", id, err)
         return nil, err
     }
+    log.Printf("Successfully retrieved image with ID: %d", id)
     return &img, nil
 }
 

@@ -4,19 +4,24 @@ document.addEventListener('DOMContentLoaded', function() {
     const resultsDiv = document.getElementById('results');
     const autocompleteResults = document.getElementById('autocomplete-results');
     const recentUploadsBody = document.getElementById('recent-uploads-body');
+    const recentUploadsContainer = document.querySelector('.grid-container');
+    const searchResultsContainer = document.getElementById('search-results-body');
 
     async function fetchRecentUploads() {
         try {
-            const response = await fetch('/api/images/recent');
+            const response = await fetch('/search');
             const images = await response.json();
             
-            recentUploadsBody.innerHTML = images.map(image => `
-                <tr>
-                    <td><img src="${image.URL || '#'}" alt="${image.description}" onerror="this.src='/static/placeholder.svg'"></td>
-                    <td>${image.description}</td>
-                    <td>${image.tags.join(', ')}</td>
-                    <td>${new Date(image.created_at).toLocaleDateString()}</td>
-                </tr>
+            recentUploadsContainer.innerHTML = images.map(image => `
+                <div class="grid-item">
+                    <a href="/image/${image.id}">
+                        <img src="${image.URL || '#'}" alt="${image.description}" class="thumbnail" onerror="this.src='/static/placeholder.svg'">
+                    </a>
+                    <div class="filename"><a href="/image/${image.id}">${image.original_filename}</a></div>
+                    <div class="description">${image.description}</div>
+                    <div class="tags">${image.tags.map(tag => `<a href="/search?q=${tag}" class="tag-link">${tag}</a>`).join(' ')}</div>
+                    <div class="upload-date">${new Date(image.created_at).toLocaleDateString()}</div>
+                </div>
             `).join('');
         } catch (error) {
             console.error('Error fetching recent uploads:', error);
@@ -34,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
         formData.append('tags', uploadForm.querySelector('input[type="text"]').value);
 
         try {
-            const response = await fetch('/api/images', {
+            const response = await fetch('/upload', {
                 method: 'POST',
                 body: formData
             });
@@ -58,19 +63,23 @@ document.addEventListener('DOMContentLoaded', function() {
         searchTimeout = setTimeout(async () => {
             const query = searchInput.value;
             if (query.length < 2) {
-                autocompleteResults.innerHTML = '';
+                searchResultsContainer.innerHTML = '';
                 return;
             }
 
             try {
-                const response = await fetch(`/api/images/search?q=${encodeURIComponent(query)}`);
+                const response = await fetch(`/search?q=${encodeURIComponent(query)}`);
                 const images = await response.json();
                 
-                resultsDiv.innerHTML = images.map(image => `
-                    <div class="image-card">
-                        <img src="${image.URL || '#'}" alt="${image.description}" onerror="this.src='/static/placeholder.svg'">
-                        <p>${image.description}</p>
-                        <p class="tags">${image.tags.join(', ')}</p>
+                searchResultsContainer.innerHTML = images.map(image => `
+                    <div class="grid-item">
+                        <a href="/image/${image.id}">
+                            <img src="${image.URL || '#'}" alt="${image.description}" class="thumbnail" onerror="this.src='/static/placeholder.svg'">
+                        </a>
+                        <div class="filename"><a href="/image/${image.id}">${image.original_filename}</a></div>
+                        <div class="description">${image.description}</div>
+                        <div class="tags">${image.tags.map(tag => `<a href="/search?q=${tag}" class="tag-link">${tag}</a>`).join(' ')}</div>
+                        <div class="upload-date">${new Date(image.created_at).toLocaleDateString()}</div>
                     </div>
                 `).join('');
             } catch (error) {
@@ -78,28 +87,4 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }, 300);
     });
-});
-
-document.getElementById('test-s3').addEventListener('click', async function() {
-    const resultDiv = document.getElementById('test-result');
-    resultDiv.textContent = 'Testing S3 connection...';
-    
-    try {
-        const response = await fetch('/api/test-s3', {
-            method: 'POST'
-        });
-        
-        const result = await response.json();
-        if (response.ok) {
-            resultDiv.innerHTML = `
-                Success!<br>
-                Path: ${result.path}<br>
-                URL: <a href="${result.url}" target="_blank">${result.url}</a>
-            `;
-        } else {
-            resultDiv.textContent = `Error: ${result.error}`;
-        }
-    } catch (error) {
-        resultDiv.textContent = `Error: ${error.message}`;
-    }
 });

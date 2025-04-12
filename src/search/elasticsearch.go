@@ -26,6 +26,14 @@ func InitElasticsearch() {
     }
 }
 
+func getIndexName() string {
+    prefix := os.Getenv("ES_INDEX_PREFIX")
+    if prefix != "" {
+        return prefix + "_images"
+    }
+    return "images"
+}
+
 type SearchResult struct {
     ID          int64    `json:"id"`
     Description string   `json:"description"`
@@ -50,7 +58,7 @@ func SearchImages(query string) ([]SearchResult, error) {
 
     res, err := esClient.Search(
         esClient.Search.WithContext(context.Background()),
-        esClient.Search.WithIndex("images"),
+        esClient.Search.WithIndex(getIndexName()),
         esClient.Search.WithBody(&buf),
     )
     if err != nil {
@@ -88,7 +96,6 @@ func interfaceArrayToStringArray(arr []interface{}) []string {
 
 func IndexImage(id int64, description string, tags []string) error {
     document := map[string]interface{}{
-        "id":          id,
         "description": description,
         "tags":        tags,
     }
@@ -99,7 +106,7 @@ func IndexImage(id int64, description string, tags []string) error {
     }
 
     res, err := esClient.Index(
-        "images",
+        getIndexName(),
         &buf,
         esClient.Index.WithDocumentID(fmt.Sprintf("%d", id)),
         esClient.Index.WithContext(context.Background()),

@@ -67,19 +67,6 @@
     border-radius: 4px;
 }
 
-#test-s3 {
-    padding: 10px 20px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-#test-s3:hover {
-    background-color: #45a049;
-}
-
 #test-result {
     margin-top: 10px;
     padding: 10px;

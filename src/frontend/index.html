@@ -36,40 +36,49 @@
         
         <div class="recent-uploads">
             <h2>Recent Uploads</h2>
-            <table id="recent-uploads-table">
-                <thead>
-                    <tr>
-                        <th>Thumbnail</th>
-                        <th>Filename</th>
-                        <th>Description</th>
-                        <th>Tags</th>
-                        <th>Upload Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {{range .Images}}
-                    <tr>
-                        <td>
-                            <a href="/image/{{.ID}}">
-                                <img src="{{.URL}}" alt="{{.Description}}" class="thumbnail">
-                            </a>
-                        </td>
-                        <td><a href="/image/{{.ID}}">{{.OriginalFilename}}</a></td>
-                        <td>{{.Description}}</td>
-                        <td>
-                            {{range .Tags}}
-                            <a href="/search?q={{.}}" class="tag-link">{{.}}</a>
-                            {{end}}
-                        </td>
-                        <td>{{.CreatedAt.Format "2006-01-02 15:04:05"}}</td>
-                    </tr>
-                    {{end}}
-                </tbody>
-                <tbody id="recent-uploads-body"></tbody>
-            </table>
+            <div class="grid-container">
+                {{range .Images}}
+                <div class="grid-item">
+                    <a href="/image/{{.ID}}">
+                        <img src="{{.URL}}" alt="{{.Description}}" class="thumbnail">
+                    </a>
+                    <div class="filename"><a href="/image/{{.ID}}">{{.OriginalFilename}}</a></div>
+                    <div class="description">{{.Description}}</div>
+                    <div class="tags">
+                        {{range .Tags}}
+                        <a href="/search?q={{.}}" class="tag-link">{{.}}</a>
+                        {{end}}
+                    </div>
+                    <div class="upload-date">{{.CreatedAt.Format "2006-01-02 15:04:05"}}</div>
+                </div>
+                {{end}}
+            </div>
         </div>
 
-        <div id="results"></div>
+        <div class="search-results">
+            <h2>Search Results</h2>
+            <div class="grid-container" id="search-results-body"></div>
+        </div>
+
+        <style>
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        .grid-item {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+        .thumbnail {
+            width: 100%;
+            height: auto;
+        }
+        .filename, .description, .tags, .upload-date {
+            margin-top: 5px;
+        }
+        </style>
     </div>
     <script src="/static/app.js"></script>
 </body>
