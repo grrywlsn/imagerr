@@ -57,3 +57,27 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 300);
     });
 });
+
+document.getElementById('test-s3').addEventListener('click', async function() {
+    const resultDiv = document.getElementById('test-result');
+    resultDiv.textContent = 'Testing S3 connection...';
+    
+    try {
+        const response = await fetch('/api/test-s3', {
+            method: 'POST'
+        });
+        
+        const result = await response.json();
+        if (response.ok) {
+            resultDiv.innerHTML = `
+                Success!<br>
+                Path: ${result.path}<br>
+                URL: <a href="${result.url}" target="_blank">${result.url}</a>
+            `;
+        } else {
+            resultDiv.textContent = `Error: ${result.error}`;
+        }
+    } catch (error) {
+        resultDiv.textContent = `Error: ${error.message}`;
+    }
+});

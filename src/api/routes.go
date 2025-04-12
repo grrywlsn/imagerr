@@ -20,6 +20,7 @@ func SetupRoutes(r *gin.Engine) {
         api.POST("/images", UploadImage)
         api.GET("/images/search", SearchImages)
         api.GET("/images/:id", GetImage)
+        api.POST("/test-s3", TestS3Upload)
         
         // Optional: Add more routes as needed
         // api.DELETE("/images/:id", DeleteImage)

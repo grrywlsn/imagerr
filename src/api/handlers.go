@@ -2,6 +2,7 @@ package api
 
 import (
     "log"
+    "fmt"
     "net/http"
     "strings"
     "path/filepath"
@@ -10,6 +11,8 @@ import (
     "github.com/grrywlsn/imagerr/src/storage"
     "github.com/grrywlsn/imagerr/src/search"
     "strconv"
+    "os"
+    "time"
 )
 
 func UploadImage(c *gin.Context) {
@@ -104,4 +107,25 @@ func GetImage(c *gin.Context) {
 
     image.URL = storage.GetFileURL(image.StoragePath)
     c.JSON(http.StatusOK, image)
+}
+
+func TestS3Upload(c *gin.Context) {
+    log.Printf("Starting S3 test upload with bucket: %s", os.Getenv("S3_BUCKET"))
+    
+    testContent := strings.NewReader("This is a test file to verify S3 connectivity")
+    storagePath, err := storage.UploadFile(testContent, fmt.Sprintf("test-%d.txt", time.Now().Unix()))
+    if err != nil {
+        log.Printf("S3 upload error: %v", err)
+        c.HTML(http.StatusInternalServerError, "index.html", gin.H{
+            "error": fmt.Sprintf("S3 test failed: %v", err),
+        })
+        return
+    }
+    
+    url := storage.GetFileURL(storagePath)
+    log.Printf("S3 upload successful. URL: %s", url)
+    c.HTML(http.StatusOK, "index.html", gin.H{
+        "success": "S3 test successful",
+        "url": url,
+    })
 }

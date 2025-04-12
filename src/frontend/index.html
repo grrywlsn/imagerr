@@ -7,6 +7,22 @@
 <body>
     <div class="container">
         <h1>Imagerr</h1>
+        
+        <form action="/api/test-s3" method="POST">
+            <button type="submit">Test S3 Connection</button>
+        </form>
+        
+        {{if .error}}
+        <div class="error">{{.error}}</div>
+        {{end}}
+        
+        {{if .success}}
+        <div class="success">
+            {{.success}}<br>
+            <a href="{{.url}}" target="_blank">View uploaded file</a>
+        </div>
+        {{end}}
+        
         <div class="search-container">
             <input type="text" id="search" placeholder="Search images...">
             <div id="autocomplete-results"></div>
@@ -22,6 +38,11 @@
             </form>
         </div>
 
+        <div class="test-container">
+            <h2>Test S3 Connection</h2>
+            <button id="test-s3" type="button">Test S3 Upload</button>
+            <div id="test-result"></div>
+        </div>
         <div id="results"></div>
     </div>
     <script src="/static/app.js"></script>

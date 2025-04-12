@@ -20,7 +20,7 @@ var (
 
 func InitS3() {
     endpoint := os.Getenv("S3_ENDPOINT")
-    bucketName = os.Getenv("S3_BUCKET")
+    bucketName = os.Getenv("S3_BUCKET_NAME")
     region := os.Getenv("S3_REGION")
 
     cfg, err := config.LoadDefaultConfig(context.TODO(),
