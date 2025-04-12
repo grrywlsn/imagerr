@@ -10,6 +10,7 @@ import (
     "github.com/grrywlsn/imagerr/src/storage"
     "github.com/grrywlsn/imagerr/src/search"
     "strconv"
+    "github.com/google/uuid"
 )
 
 func UploadImage(c *gin.Context) {
@@ -29,17 +30,23 @@ func UploadImage(c *gin.Context) {
         tags[i] = strings.TrimSpace(tags[i])
     }
 
+    // Generate UUID for filename
+    originalFilename := filepath.Base(header.Filename)
+    fileExt := filepath.Ext(originalFilename)
+    uuidFilename := uuid.New().String() + fileExt
+
     // Upload to S3
-    filename := filepath.Base(header.Filename)
-    storagePath, err := storage.UploadFile(file, filename)
+    storagePath, err := storage.UploadFile(file, uuidFilename)
     if err != nil {
+        log.Printf("Error uploading file to S3: %v", err)
         c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to upload file"})
         return
     }
 
-    // Save to database
-    image, err := db.CreateImage(filename, description, storagePath, tags)
+    // Save to database with both original and UUID filenames
+    image, err := db.CreateImage(originalFilename, uuidFilename, description, storagePath, tags)
     if err != nil {
+        log.Printf("Error saving to database: %v", err)
         c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save to database"})
         return
     }
@@ -51,6 +58,21 @@ func UploadImage(c *gin.Context) {
     }
 
     c.JSON(http.StatusOK, image)
+}
+
+func GetRecentUploads(c *gin.Context) {
+    images, err := db.GetRecentImages(10)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch recent uploads"})
+        return
+    }
+
+    // Add CDN URLs to images
+    for i := range images {
+        images[i].URL = storage.GetFileURL(images[i].StoragePath)
+    }
+
+    c.JSON(http.StatusOK, images)
 }
 
 func SearchImages(c *gin.Context) {

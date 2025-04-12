@@ -64,6 +64,10 @@ func UploadFile(file io.Reader, filename string) (string, error) {
 }
 
 func GetFileURL(storagePath string) string {
+    cdnDomain := os.Getenv("CDN_DOMAIN")
+    if cdnDomain != "" {
+        return fmt.Sprintf("%s/%s", cdnDomain, storagePath)
+    }
     return fmt.Sprintf("%s/%s/%s", os.Getenv("S3_ENDPOINT"), bucketName, storagePath)
 }
 

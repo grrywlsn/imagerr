@@ -17,8 +17,8 @@ func SetupRoutes(r *gin.Engine) {
     api := r.Group("/api")
     {
         // Image routes
-        api.POST("/images", UploadImage)
-        api.GET("/images/search", SearchImages)
-        api.GET("/images/:id", GetImage)
+        api.POST("/upload", UploadImage)
+        api.GET("/search", SearchImages)
+        api.GET("/images/recent", GetRecentUploads)
     }
 }

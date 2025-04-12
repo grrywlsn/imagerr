@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS images (
     id SERIAL PRIMARY KEY,
-    filename VARCHAR(255) NOT NULL,
+    original_filename VARCHAR(255) NOT NULL,
+    uuid_filename VARCHAR(255) NOT NULL,
     description TEXT,
     tags TEXT[],
     storage_path VARCHAR(255) NOT NULL,

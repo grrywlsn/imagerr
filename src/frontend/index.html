@@ -8,10 +8,6 @@
     <div class="container">
         <h1>Imagerr</h1>
         
-        <form action="/api/test-s3" method="POST">
-            <button type="submit">Test S3 Connection</button>
-        </form>
-        
         {{if .error}}
         <div class="error">{{.error}}</div>
         {{end}}
@@ -23,11 +19,6 @@
         </div>
         {{end}}
         
-        <div class="search-container">
-            <input type="text" id="search" placeholder="Search images...">
-            <div id="autocomplete-results"></div>
-        </div>
-        
         <div class="upload-container">
             <h2>Upload Image</h2>
             <form id="upload-form">
@@ -36,6 +27,26 @@
                 <input type="text" placeholder="Tags (comma separated)" required>
                 <button type="submit">Upload</button>
             </form>
+        </div>
+
+        <div class="search-container">
+            <input type="text" id="search" placeholder="Search images...">
+            <div id="autocomplete-results"></div>
+        </div>
+        
+        <div class="recent-uploads">
+            <h2>Recent Uploads</h2>
+            <table id="recent-uploads-table">
+                <thead>
+                    <tr>
+                        <th>Thumbnail</th>
+                        <th>Description</th>
+                        <th>Tags</th>
+                        <th>Upload Date</th>
+                    </tr>
+                </thead>
+                <tbody id="recent-uploads-body"></tbody>
+            </table>
         </div>
 
         <div id="results"></div>

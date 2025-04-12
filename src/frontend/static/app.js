@@ -3,6 +3,27 @@ document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('search');
     const resultsDiv = document.getElementById('results');
     const autocompleteResults = document.getElementById('autocomplete-results');
+    const recentUploadsBody = document.getElementById('recent-uploads-body');
+
+    async function fetchRecentUploads() {
+        try {
+            const response = await fetch('/api/images/recent');
+            const images = await response.json();
+            
+            recentUploadsBody.innerHTML = images.map(image => `
+                <tr>
+                    <td><img src="${image.URL}" alt="${image.description}"></td>
+                    <td>${image.description}</td>
+                    <td>${image.tags.join(', ')}</td>
+                    <td>${new Date(image.created_at).toLocaleDateString()}</td>
+                </tr>
+            `).join('');
+        } catch (error) {
+            console.error('Error fetching recent uploads:', error);
+        }
+    }
+
+    fetchRecentUploads();
 
     uploadForm.addEventListener('submit', async function(e) {
         e.preventDefault();
@@ -25,6 +46,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const result = await response.json();
             alert('Image uploaded successfully!');
             uploadForm.reset();
+            fetchRecentUploads(); // Refresh the recent uploads table
         } catch (error) {
             alert('Error uploading image: ' + error.message);
         }
