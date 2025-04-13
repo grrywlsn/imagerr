@@ -17,4 +17,6 @@ func SetupRoutes(r *gin.Engine) {
     r.POST("/upload", UploadImage)
     r.GET("/search", SearchImages)
     r.GET("/image/:id", GetImage)
+    r.GET("/reindex", ReindexImages)
+    r.GET("/api/tags/suggest", SuggestTags)
 }

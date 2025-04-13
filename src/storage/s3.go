@@ -8,10 +8,11 @@ import (
     "os"
     "strings"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
+    "github.com/aws/aws-sdk-go-v2/aws"
     "github.com/aws/aws-sdk-go-v2/config"
     "github.com/aws/aws-sdk-go-v2/credentials"
     "github.com/aws/aws-sdk-go-v2/service/s3"
+    "github.com/aws/aws-sdk-go-v2/service/s3/types"
 )
 
 var (
@@ -51,11 +52,12 @@ func UploadFile(file io.Reader, filename string) (string, error) {
     // Generate unique path for the file
     storagePath := fmt.Sprintf("images/%s", filename)
 
-    // Upload to S3
+    // Upload to S3 with public-read ACL
     _, err := s3Client.PutObject(context.TODO(), &s3.PutObjectInput{
         Bucket: &bucketName,
         Key:    &storagePath,
         Body:   file,
+        ACL:    types.ObjectCannedACLPublicRead,
     })
     if err != nil {
         return "", fmt.Errorf("failed to upload file: %v", err)

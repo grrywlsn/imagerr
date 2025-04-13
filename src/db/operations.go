@@ -51,7 +51,6 @@ func GetImageByID(id int64) (*Image, error) {
         log.Printf("Error retrieving image with ID %d: %v", id, err)
         return nil, err
     }
-    log.Printf("Successfully retrieved image with ID: %d", id)
     return &img, nil
 }
 
@@ -91,11 +90,52 @@ func GetRecentImages(limit int) ([]Image, error) {
 }
 
 func SearchImages(query string) ([]Image, error) {
+    // Add logging to debug the search query
+    log.Printf("Searching for: %s", query)
+    
     rows, err := DB.Query(`
         SELECT id, original_filename, uuid_filename, description, tags, storage_path, created_at
         FROM images
-        WHERE description ILIKE $1 OR $1 = ANY(tags)
+        WHERE description ILIKE $1 OR EXISTS (
+            SELECT 1 FROM unnest(tags) tag WHERE tag ILIKE $1
+        )
     `, "%"+query+"%")
+    
+    if err != nil {
+        log.Printf("Search query error: %v", err)
+        return nil, err
+    }
+    defer rows.Close()
+
+    var images []Image
+    for rows.Next() {
+        var img Image
+        err := rows.Scan(
+            &img.ID,
+            &img.OriginalFilename,
+            &img.UUIDFilename,
+            &img.Description,
+            pq.Array(&img.Tags),
+            &img.StoragePath,
+            &img.CreatedAt,
+        )
+        if err != nil {
+            return nil, err
+        }
+        images = append(images, img)
+    }
+    if err = rows.Err(); err != nil {
+        return nil, err
+    }
+    return images, nil
+}
+
+func GetAllImages() ([]Image, error) {
+    rows, err := DB.Query(`
+        SELECT id, original_filename, uuid_filename, description, tags, storage_path, created_at
+        FROM images
+        ORDER BY id ASC
+    `)
     if err != nil {
         return nil, err
     }

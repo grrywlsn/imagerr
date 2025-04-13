@@ -8,7 +8,11 @@
     <div class="container">
         <h1>Error</h1>
         <div class="error-message">
-            {{.error}}
+            {{if .error}}
+                <p>{{.error}}</p>
+            {{else}}
+                <p>An unexpected error occurred</p>
+            {{end}}
         </div>
         <a href="/" class="home-link">Return to Home</a>
     </div>
